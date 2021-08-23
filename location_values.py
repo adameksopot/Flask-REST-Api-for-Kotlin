@@ -26,18 +26,19 @@ class LocationValues(Resource):
         connection = sqlite3.connect('db.db')
         cursor = connection.cursor()
         query = "select * from (select * from location order by id ASC LIMIT 1) UNION select * from (select * from location order by id DESC LIMIT 1)"
+
         result = cursor.execute(query).fetchmany(2)
-        connection.close()
-        starting_point = result[0]
-        ending_point = result[1]
-        lat1 = starting_point[1]
-        lon1 = starting_point[2]
-        lat2 = ending_point[1]
-        lon2 = ending_point[2]
+        if result:
+            connection.close()
+            starting_point = result[0]
+            ending_point = result[1]
+            lat1 = starting_point[1]
+            lon1 = starting_point[2]
+            lat2 = ending_point[1]
+            lon2 = ending_point[2]
 
-        distance = calculateDistance(radians(lat1), radians(lon1), radians(lat2), radians(lon2))
+            distance = calculateDistance(radians(lat1), radians(lon1), radians(lat2), radians(lon2))
 
-        if distance:
             return {"Distance": round(distance, 2)}, 201
         return {"message": "failure"}, 400
 
